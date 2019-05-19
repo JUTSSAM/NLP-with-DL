@@ -1,9 +1,9 @@
 import numpy as np
 from keras.models import Sequential
 from keras.layers.embeddings import Embedding
-from keras.layers import Flatten
-from keras.layers import Dense
+from keras.layers import Flatten, Dropout, Activation, Dense
 from keras.preprocessing import sequence
+from keras.layers import Conv1D, MaxPooling1D
 
 ids = np.load('Object/idMatrix.npy')
 
@@ -18,17 +18,20 @@ x_train = sequence.pad_sequences(x_train, maxlen=max_word)
 # x_test = sequence.pad_sequences(x_test, maxlen=max_word)
 vocab_size = np.max([np.max(x_train[i]) for i in range(x_train.shape[0])]) + 1
 
+# 卷积神经网络
 model = Sequential()
-
 model.add(Embedding(vocab_size, 64, input_length=max_word))
-model.add(Flatten())
-# model.add(Dense(2000, activation='relu'))
-# model.add(Dense(500, activation='relu'))
-# model.add(Dense(200, activation='relu'))
-model.add(Dense(20, activation='relu'))
-model.add(Dense(1, activation='sigmoid'))
+model.add(Conv1D(filters=64, kernel_size=3, padding='same', activation='relu'))
+model.add(MaxPooling1D(pool_size=2))
+model.add(Dropout(0.25))
+model.add(Conv1D(filters=128, kernel_size=3, padding='same', activation='relu'))
 
-model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+model.add(MaxPooling1D(pool_size=2))
+model.add(Dropout(0.25))
+model.add(Dense(64, activation='relu'))
+model.add(Dense(32, activation='relu'))
+model.add(Dense(1, activation='sigmoid'))
+model.compile(loss='binary_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
 
 print(model.summary())
 

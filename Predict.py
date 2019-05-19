@@ -3,7 +3,7 @@ import numpy as np
 import jieba
 from keras.preprocessing import sequence
 
-model = load_model('Object/model.cpkt')
+model = load_model('Object/LSTM.cpkt')
 
 word_list = np.load('Object/dict.npy')
 word_list = word_list.tolist()
